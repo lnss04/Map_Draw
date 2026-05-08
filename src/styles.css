@@ -341,21 +341,20 @@ app-canton-edit .modal-content {
   gap: 0;
   align-items: stretch;
   width: max-content;
-  min-width: 100%;
 }
 
 .panel-spacer,
 .line-row-cell,
-.section-cell          { min-height: 44px; }
+.section-cell          { height: 44px; }
 
 .header-spacer,
-.section-grid-header .section-header { min-height: 38px; }
+.section-header { height: 38px; }
 
 .base-spacer,
-.section-grid-base .section-base     { min-height: 56px; }
+.section-grid-base    { height: 56px; }
 
 .details-spacer,
-.section-grid-details .section-details { min-height: 138px; }
+.section-grid-details .section-details { height: 138px; }
 
 .grid-cell {
   display: flex;
@@ -364,13 +363,44 @@ app-canton-edit .modal-content {
 }
 
 .section-header {
-  display: flex; align-items: center; justify-content: space-between;
-  gap: 0.5rem; font-size: 0.72rem; padding: 6px 8px;
+  display: flex; align-items: center;
+  gap: 0; font-size: 0.72rem; padding: 0;
   background: rgba(59, 130, 246, 0.06);
-  box-sizing: border-box; width: 160px;
+  box-sizing: border-box;
 }
 .sh-pole   { font-weight: 600; color: #93c5fd; }
 .sh-length { color: #a8a29e; font-size: 0.68rem; }
+
+/* Header row: pole label cells at the boundary positions (= where the
+   poles render in the body rows). The first pole sits at the right
+   edge of the left pole-spacer, intermediate poles sit at the right
+   edge of each section-header-cell, and the last pole sits at the
+   left edge of the right pole-spacer. Labels are absolute-positioned
+   so they overlap the boundary line and stay visually centered on it. */
+.section-header-cell {
+  position: relative;
+  display: flex; align-items: center; justify-content: center;
+  height: 38px; padding: 0;
+}
+.header-pole-cell-first,
+.header-pole-cell-last {
+  position: relative;
+  display: flex; align-items: center;
+  height: 38px;
+}
+.header-pole-cell-first .sh-pole {
+  position: absolute; right: 0;
+  transform: translateX(50%);
+}
+.header-pole-cell-last .sh-pole {
+  position: absolute; left: 0;
+  transform: translateX(-50%);
+}
+.pole-junction {
+  position: absolute; right: 0;
+  transform: translateX(50%);
+  z-index: 2;
+}
 
 .line-details  { padding: 6px 10px 6px 0; box-sizing: border-box; }
 .cg-line-select { flex: 1; width: 130px; font-size: 0.8rem; }
@@ -378,7 +408,7 @@ app-canton-edit .modal-content {
 
 .section-cell {
   padding: 0; position: relative;
-  box-sizing: border-box; width: 160px;
+  box-sizing: border-box; flex: 0 0 160px;
 }
 
 .section-content,
@@ -395,15 +425,15 @@ app-canton-edit .modal-content {
   align-items: center; min-width: 0;
 }
 .section-curve,
-.section-dashed { width: 100%; height: 36px; }
+.section-dashed { width: 100%; height: 30px; }
 
-.sag-label { font-size: 0.65rem; color: #94a3b8; margin-top: -2px; }
+.sag-label { font-size: 0.65rem; color: #94a3b8; margin-top: -10px; }
 
 .line-action { padding: 4px 0 4px 8px; box-sizing: border-box; }
 
 .section-base {
   flex-direction: column; justify-content: center;
-  padding: 0; min-height: 0; width: 160px;
+  padding: 0; min-height: 0; flex: 0 0 160px;
 }
 .base-combined { line-height: 0; }
 .half-base-svg  { flex-shrink: 0; display: block; }
@@ -411,11 +441,12 @@ app-canton-edit .modal-content {
 .section-details {
   flex-direction: column; align-items: stretch;
   justify-content: center; padding: 6px 4px 8px;
-  border-radius: 0 0 6px 6px; box-sizing: border-box; width: 160px;
+  border-radius: 0 0 6px 6px; box-sizing: border-box; flex: 0 0 160px;
 }
 
-.detail-row    { font-size: 0.68rem; padding: 1px 4px; }
+.detail-row    {  }
 .detail-val    { color: #e2e8f0; font-weight: 500; font-family: 'Cascadia Code','Fira Code',monospace; }
+.detail-lbl    { width: 55px; }
 .detail-heading {
   font-size: 0.62rem; color: #64748b;
   text-transform: uppercase; letter-spacing: 0.05em;
@@ -443,4 +474,10 @@ app-canton-edit .modal-content {
   .coordinates-display { margin-bottom: 2.75rem !important; margin-right: 0.5rem !important; font-size: 0.7rem; }
 }
 
+.pole-spacer { flex: 0 0 55px; }
 
+.text-allignement { justify-content: start }
+
+.debug { border: 1px solid red; }
+
+.debug1 { border: 1px solid green;}

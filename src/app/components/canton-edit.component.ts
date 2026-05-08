@@ -50,12 +50,12 @@ import { CantonService } from '../services/canton.service';
               <div class="canton-grid">
 
                 <div class="left-panel d-flex flex-column">
-                  <div class="section-grid section-grid-header">
-                      <div class="grid-cell section-header text-secondary-emphasis small text-uppercase fw-semibold">
-                        <span>Line type</span>
+                  <div class="section-grid section-header">
+                      <div class="grid-cell sh-pole" style="width: 200px;">
+                        <span>LINE TYPE</span>
                       </div>
-                      <div class="grid-cell section-header text-secondary-emphasis small text-uppercase fw-semibold">
-                        <span>Max load</span>
+                      <div class="grid-cell sh-pole" style="width: 100px;">
+                        <span>MAX LOAD</span>
                       </div>
                   </div>
 
@@ -82,19 +82,34 @@ import { CantonService } from '../services/canton.service';
 
                 <div class="sections-panel">
 
-                  <!-- Section header: start pole, span length, end pole -->
-                  <div class="section-grid section-grid-header">
-                    <ng-container *ngFor="let section of canton.sections; let si = index">
-                      <div class="grid-cell section-header">
-                        <span class="sh-pole">P{{ section.startPole.id }}</span>
-                        <span class="sh-length">{{ section.length | number:'1.1-1' }} m</span>
-                        <span class="sh-pole">P{{ section.endPole.id }}</span>
+                  <!-- Section header: pole labels positioned exactly above the poles in the body. -->
+                  <div class="section-grid section-header">
+                    <!-- First pole: label sits at the right edge of the left pole-spacer (= x=55 in body) -->
+                    <div class="pole-spacer header-pole-cell-first">
+                      <span class="sh-pole">P{{ canton.poles[0].id }}</span>
+                    </div>
+
+                    <!-- One header cell per section. End-pole label sits at the right edge so it
+                         visually centers on the section boundary, except for the last section
+                         (its end pole goes in the right pole-spacer below). -->
+                    <ng-container *ngFor="let section of canton.sections; let si = index; let last = last">
+                      <div class="grid-cell section-cell section-header-cell">
+                        <span class="sh-length">Length: {{ section.length | number:'1.1-1' }} m</span>
+                        <span class="sh-pole pole-junction" *ngIf="!last">P{{ section.endPole.id }}</span>
                       </div>
                     </ng-container>
+
+                    <!-- Last pole: label sits at the left edge of the right pole-spacer -->
+                    <div class="pole-spacer header-pole-cell-last">
+                      <span class="sh-pole">P{{ canton.poles[canton.poles.length - 1].id }}</span>
+                    </div>
                   </div>
 
                   <ng-container *ngFor="let line of lines; let li = index">
-                    <div class="section-grid line-sections-row">
+                    <div class="section-grid line-sections-row ">
+                      <div class="pole-spacer d-flex justify-content-end">
+                        <img class="half-pole-svg" src="assets/canton-edit/half-pole-right.svg" alt="" />
+                      </div>
                       <ng-container *ngFor="let section of canton.sections; let si = index">
                         <div class="grid-cell section-cell">
                           <ng-container *ngIf="line.lineSections[si] as ls">
@@ -103,7 +118,7 @@ import { CantonService } from '../services/canton.service';
                             <div class="section-content" *ngIf="ls.linked">
                               <!-- Left half of the pole at the start of the section -->
                               <img class="half-pole-svg" src="assets/canton-edit/half-pole-left.svg" alt="" />
-                              <div class="section-curve-wrapper">
+                              <div class="section-curve-wrapper ">
                                 <!-- Cable curve between the two poles -->
                                 <img class="section-curve" src="assets/canton-edit/section-curve.svg" alt="" />
                                 <!-- Sag value for this linked line section -->
@@ -122,15 +137,20 @@ import { CantonService } from '../services/canton.service';
                               <!-- Right half of the pole at the end of the section -->
                               <img class="half-pole-svg" src="assets/canton-edit/half-pole-right.svg" alt="" />
                             </div>
-
                           </ng-container>
                         </div>
                       </ng-container>
+                      <div class="pole-spacer d-flex justify-content-start">
+                        <img class="half-pole-svg" src="assets/canton-edit/half-pole-left.svg" alt="" />
+                      </div>
                     </div>
                   </ng-container>
 
                   <!-- Pole base row: ground/base graphics under each section boundary -->
                   <div class="section-grid section-grid-base">
+                    <div class="pole-spacer d-flex justify-content-end">
+                      <img class="half-base-svg" src="assets/canton-edit/half-base-right.svg" alt="" />
+                    </div>
                     <ng-container *ngFor="let section of canton.sections; let si = index">
                       <div class="grid-cell section-base">
                         <div class="base-combined d-flex justify-content-between align-items-start w-100">
@@ -141,43 +161,45 @@ import { CantonService } from '../services/canton.service';
                         </div>
                       </div>
                     </ng-container>
+                    <div class="pole-spacer d-flex justify-content-start">
+                      <img class="half-base-svg" src="assets/canton-edit/half-base-left.svg" alt="" />
+                    </div>
                   </div>
 
                   <!-- Pole details row: pole metadata and computed constraints -->
                   <div class="section-grid section-grid-details">
-                    <ng-container *ngFor="let section of canton.sections; let si = index">
+                    <ng-container *ngFor="let pole of canton.poles; let si = index">
                       <div class="grid-cell section-details">
                         <div class="mt-2 w-100 small">
-                          <div class="detail-row d-flex justify-content-between">
-                            <span class="detail-lbl text-secondary">ID</span>
-                            <span class="detail-val">{{ section.endPole.id }}</span>
+                          <div class="detail-row d-flex justify-content-start">
+                            <span class="detail-lbl text-secondary">ID: </span>
+                            <span class="detail-val">{{ pole.id }}</span>
                           </div>
-                          <div class="detail-row d-flex justify-content-between">
-                            <span class="detail-lbl text-secondary">Height</span>
-                            <span class="detail-val">{{ section.endPole.aboveGroundHeight | number:'1.1-1' }} m</span>
+                          <div class="detail-row d-flex justify-content-start">
+                            <span class="detail-lbl text-secondary">Height: </span>
+                            <span class="detail-val">{{ pole.aboveGroundHeight | number:'1.1-1' }} m</span>
                           </div>
-                          <div class="detail-row d-flex justify-content-between">
-                            <span class="detail-lbl text-secondary">Strength</span>
-                            <span class="detail-val">{{ section.endPole.strength | number:'1.0-0' }} kg</span>
+                          <div class="detail-row d-flex justify-content-start">
+                            <span class="detail-lbl text-secondary">Strength: </span>
+                            <span class="detail-val">{{ pole.strength | number:'1.0-0' }} kg</span>
                           </div>
                           <div class="detail-heading">Constraints</div>
-                          <div class="detail-row d-flex justify-content-between">
-                            <span class="detail-lbl text-secondary">Mech</span>
-                            <span class="detail-val">{{ section.endPole.mechanicalConstraint.intensity | number:'1.2-2' }}</span>
+                          <div class="detail-row d-flex justify-content-start">
+                            <span class="detail-lbl text-secondary">Mech: </span>
+                            <span class="detail-val">{{ pole.mechanicalConstraint.intensity | number:'1.2-2' }}</span>
                           </div>
-                          <div class="detail-row d-flex justify-content-between">
-                            <span class="detail-lbl text-secondary">Wind</span>
-                            <span class="detail-val">{{ section.endPole.windConstraint.intensity | number:'1.2-2' }}</span>
+                          <div class="detail-row d-flex justify-content-start">
+                            <span class="detail-lbl text-secondary">Wind: </span>
+                            <span class="detail-val">{{ pole.windConstraint.intensity | number:'1.2-2' }}</span>
                           </div>
-                          <div class="detail-row d-flex justify-content-between">
-                            <span class="detail-lbl text-secondary">Total</span>
-                            <span class="detail-val">{{ section.endPole.totalConstraint.intensity | number:'1.2-2' }}</span>
+                          <div class="detail-row d-flex justify-content-start">
+                            <span class="detail-lbl text-secondary">Total: </span>
+                            <span class="detail-val">{{ pole.totalConstraint.intensity | number:'1.2-2' }}</span>
                           </div>
                         </div>
                       </div>
                     </ng-container>
                   </div>
-                  
                 </div>
 
                 <div class="side-panel right-panel d-flex flex-column">
