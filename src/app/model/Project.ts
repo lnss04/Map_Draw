@@ -73,15 +73,12 @@ export class Project {
             const lsStartList = lineSections.filter(ls => pole === ls.section.startPole);
             const lsEndList = lineSections.filter(ls => pole === ls.section.endPole);
             const windConstraints = Array(360).fill(null).map((_, i) => i).map(a => {
-                    // if(p.id == 1 && a == 0) {
-                    //     const xxx = 0;
-                    // }
-                    const angle = a * Math.PI / 180;
-                    const reduceStart = lsStartList.map(ls => ls.getWindConstraintStartVector(angle)).reduce((acc, v) => acc + v, 0);
-                    const reduceEnd = lsEndList.map(ls => ls.getWindConstraintEndVector(angle)).reduce((acc, v) => acc + v, 0);
-                    const windConstraint = reduceStart + reduceEnd;
-                    return Vector.getVector(windConstraint, angle);
-                });
+                const angle = a * Math.PI / 180;
+                const reduceStart = lsStartList.map(ls => ls.getWindConstraintStartVector(angle)).reduce((acc, v) => acc + v, 0);
+                const reduceEnd = lsEndList.map(ls => ls.getWindConstraintEndVector(angle)).reduce((acc, v) => acc + v, 0);
+                const windConstraint = reduceStart + reduceEnd;
+                return Vector.getVector(windConstraint, angle);
+            });
             const maxWindConstraint = windConstraints.reduce((max, current) => current.intensity > max.intensity ? current : max , new Vector(0, 0));
             pole.windConstraint = maxWindConstraint;
         });
@@ -91,5 +88,11 @@ export class Project {
         this.poles.forEach(pole => {
             pole.totalConstraint = pole.mechanicalConstraint.add(pole.windConstraint);
         });
+    }
+
+    calc(): void {
+        this.calcMechanicalConstraint();
+        this.calcWindConstraint();
+        this.calcTotalConstraint();
     }
 }

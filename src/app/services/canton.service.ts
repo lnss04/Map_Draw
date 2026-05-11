@@ -107,10 +107,7 @@ export class CantonService {
    * Applies edited canton data and persists.
    */
   updateCanton(updated: Canton): void {
-    const canton = this.state.project.cantons.find(c => c.id === updated.id);
-    if (!canton) return;
-    // Currently no user-editable canton fields beyond those shown;
-    // extend here when new fields are added.
+    this.state.project.calc();
     this.persistence.saveState();
     this.state.showMessage('success', 'Canton saved.');
   }
@@ -144,6 +141,7 @@ export class CantonService {
   refreshCantonFeatures(): void {
     this.state.cantonSource.clear();
     this.state.project.cantons.forEach(canton => this.renderCanton(canton));
+    //TO DO: add calc();
   }
 
   // ============================================================

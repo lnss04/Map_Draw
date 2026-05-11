@@ -15,6 +15,7 @@ import { Line } from '../model/Line';
 import { Pole } from '../model/Pole';
 import { appSettings, Cable } from '../config/AppSettings';
 import { CantonService } from '../services/canton.service';
+import { MapStateService } from '../services/map-state.service';
 
 @Component({
   selector: 'app-canton-edit',
@@ -71,8 +72,8 @@ import { CantonService } from '../services/canton.service';
                         type="number"
                         class="form-control form-control-sm cg-max-input text-end font-monospace"
                         [ngModel]="line.maxConstraint"
-                        (ngModelChange)="line.maxConstraint = $event"
-                        min="0" step="0.1" />
+                        (ngModelChange)="onMaxConstraintChange(line, $event)"
+                        min="0" step="1" />
                     </div>
                   </ng-container>
 
@@ -94,7 +95,7 @@ import { CantonService } from '../services/canton.service';
                          (its end pole goes in the right pole-spacer below). -->
                     <ng-container *ngFor="let section of canton.sections; let si = index; let last = last">
                       <div class="grid-cell section-cell section-header-cell">
-                        <span class="sh-length">Length: {{ section.length | number:'1.1-1' }} m</span>
+                        <span class="sh-length">{{ section.length | number:'1.1-1' }} m</span>
                         <span class="sh-pole pole-junction" *ngIf="!last">P{{ section.endPole.id }}</span>
                       </div>
                     </ng-container>
@@ -238,7 +239,8 @@ export class CantonEditComponent implements OnChanges {
   @Output() cancelled = new EventEmitter<void>();
 
   constructor(
-    private cantonService: CantonService
+    private cantonService: CantonService,
+    private mapStateService: MapStateService
   ) { }
 
   totalLength = 0;
@@ -271,7 +273,10 @@ export class CantonEditComponent implements OnChanges {
   /** Remove a line and its associated LineSections */
   removeLine(index: number): void {
     const line = this.canton.lines[index];
-    line.lineSections = [];
+    line.lineSections.forEach(ls => {
+      const x = ls.section.lineSections.indexOf(ls);
+      ls.section.lineSections.splice(x, 1);
+    });
     this.canton.lines.splice(index, 1);
     this.cantonService.updateCanton(this.canton);
   }
@@ -279,6 +284,11 @@ export class CantonEditComponent implements OnChanges {
   /** When the type dropdown changes, update the line's type */
   onTypeChange(line: Line, newType: string): void {
     line.type = newType;
+    this.cantonService.updateCanton(this.canton);
+  }
+
+  onMaxConstraintChange(line: Line, value: number): void {
+    line.maxConstraint = value;
     this.cantonService.updateCanton(this.canton);
   }
 
