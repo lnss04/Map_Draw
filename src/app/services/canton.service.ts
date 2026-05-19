@@ -98,6 +98,7 @@ export class CantonService {
     const feature = this.state.cantonSource.getFeatureById(`canton-${cantonId}`);
     if (feature) this.state.cantonSource.removeFeature(feature);
     this.state.selectedCantonId = null;
+    this.state.project.calc();
     this.persistence.saveState();
     this.state.updateStats();
     this.state.showMessage('success', 'Canton removed.');

@@ -25,4 +25,8 @@ export class Vector {
         let y = windConstraint * Math.sin(angle);
         return new Vector(x, y);
     }
+
+    public static fromJSON(json: any): Vector {
+        return new Vector(json.x, json.y);
+    }
 }

@@ -39,7 +39,7 @@ const LAMBERT_72_PROJ = '+proj=lcc +lat_1=51.16666723333333 +lat_2=49.8333339 +l
 
 proj4.defs('EPSG:31370', LAMBERT_72_PROJ);
 
-const DEFAULT_CENTER: [number, number] = [4.3517, 50.8503]; // Brussels, Belgium
+const DEFAULT_CENTER: [number, number] = [3.957044, 50.461443]; // Brussels, Belgium
 const DEFAULT_ZOOM = 18;
 
 @Injectable({
@@ -433,17 +433,13 @@ export class MapService implements OnDestroy {
    * Handles dragging to move the selected pole to a new position.
    */
   private handleMoveDrag(coordinate: [number, number]): void {
-    const pole = this.state.project.poles.find(p => p.id === this.state.selectedPoleId);
-    if (!pole) return;
-
-    const lonLat = toLonLat(coordinate) as [number, number];
-    pole.position = new Position(lonLat[0], lonLat[1], pole.position.z);
-
-    const feature = this.state.poleSource.getFeatureById(`pole-${pole.id}`) as Feature;
+    const feature = this.state.poleSource.getFeatureById(`pole-${this.state.selectedPoleId}`) as Feature;
     if (feature) {
-      feature.setGeometry(PoleService.getPoleDrawing(lonLat[0], lonLat[1]));
+      const pole = feature.get('pole');
+      const lonLat = toLonLat(coordinate) as [number, number];
+      pole.position = new Position(lonLat[0], lonLat[1], pole.position.z);
+      feature.setGeometry(PoleService.getPoleDrawing(lonLat[0], lonLat[1], pole.totalConstraint));
     }
-
     this.cantonService.refreshCantonFeatures();
   }
 

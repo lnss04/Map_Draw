@@ -178,7 +178,7 @@ import { MapStateService } from '../services/map-state.service';
                           </div>
                           <div class="detail-row d-flex justify-content-start">
                             <span class="detail-lbl text-secondary">Height: </span>
-                            <span class="detail-val">{{ pole.aboveGroundHeight | number:'1.1-1' }} m</span>
+                            <span class="detail-val">{{ pole.aboveGroundHeight | number:'1.0-0' }} m</span>
                           </div>
                           <div class="detail-row d-flex justify-content-start">
                             <span class="detail-lbl text-secondary">Strength: </span>
@@ -187,15 +187,18 @@ import { MapStateService } from '../services/map-state.service';
                           <div class="detail-heading">Constraints</div>
                           <div class="detail-row d-flex justify-content-start">
                             <span class="detail-lbl text-secondary">Mech: </span>
-                            <span class="detail-val">{{ pole.mechanicalConstraint.intensity | number:'1.2-2' }}</span>
+                            <span class="detail-val">{{ pole.mechanicalConstraint.intensity | number:'1.0-0' }} daN</span>
+                            <span class="detail-val">&nbsp;{{ pole.mechanicalConstraint.angle | number:'1.0-0' }}º</span>
                           </div>
                           <div class="detail-row d-flex justify-content-start">
                             <span class="detail-lbl text-secondary">Wind: </span>
-                            <span class="detail-val">{{ pole.windConstraint.intensity | number:'1.2-2' }}</span>
+                            <span class="detail-val">{{ pole.windConstraint.intensity | number:'1.0-0' }} daN</span>
+                            <span class="detail-val">&nbsp;{{ pole.windConstraint.angle | number:'1.0-0' }}º</span>
                           </div>
                           <div class="detail-row d-flex justify-content-start">
                             <span class="detail-lbl text-secondary">Total: </span>
-                            <span class="detail-val">{{ pole.totalConstraint.intensity | number:'1.2-2' }}</span>
+                            <span class="detail-val">{{ pole.totalConstraint.intensity | number:'1.0-0' }} daN</span>
+                            <span class="detail-val">&nbsp;{{ pole.totalConstraint.angle | number:'1.0-0' }}º</span>
                           </div>
                         </div>
                       </div>
@@ -259,6 +262,7 @@ export class CantonEditComponent implements OnChanges {
 
   ngOnChanges(): void {
     if (this.canton) {
+      this.canton.sections.forEach(s => s.recompute());
       this.totalLength = this.canton.sections.reduce((sum, s) => sum + s.length, 0);
     }
   }
@@ -284,6 +288,7 @@ export class CantonEditComponent implements OnChanges {
   /** When the type dropdown changes, update the line's type */
   onTypeChange(line: Line, newType: string): void {
     line.type = newType;
+    line.maxConstraint = line.cable.maxConstraint;
     this.cantonService.updateCanton(this.canton);
   }
 

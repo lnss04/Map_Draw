@@ -4,7 +4,7 @@ import { LineSection } from "./LineSection";
 import { Section } from "./Section";
 
 export class Line {
-
+  
     constructor(type: string) {
       this.type = type;
     }

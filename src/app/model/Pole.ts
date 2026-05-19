@@ -47,7 +47,7 @@ export class Pole {
 
     public static fromJSON(json: any): Pole {
         const position = Position.fromJSON(json.position);
-        return new Pole(
+        const pole = new Pole(
             json.id,
             json.strength,
             json.height,
@@ -55,5 +55,9 @@ export class Pole {
             json.aboveGroundHeight,
             position
         );
+        pole.mechanicalConstraint = Vector.fromJSON(json.mechanicalConstraint);
+        pole.windConstraint = Vector.fromJSON(json.windConstraint);
+        pole.totalConstraint = Vector.fromJSON(json.totalConstraint);
+        return pole;
     }
 }

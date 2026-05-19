@@ -90,9 +90,14 @@ export class Project {
         });
     }
 
+    calcSag(): void {
+        
+    }
+
     calc(): void {
         this.calcMechanicalConstraint();
         this.calcWindConstraint();
         this.calcTotalConstraint();
+        this.calcSag();
     }
 }

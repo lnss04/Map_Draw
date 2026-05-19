@@ -12,6 +12,7 @@ import { MapStateService } from './map-state.service';
 import { MapPersistenceService } from './map-persistence.service';
 import { Position } from '../model/Position';
 import { GeometryCollection, LineString } from 'ol/geom';
+import { Vector } from '../model/Vector';
 
 const MIN_POLE_DISTANCE_METERS = 0.5; // 50cm minimum distance between poles
 const DEFAULT_CENTER_LAT = 50.8503;   // Brussels latitude for distance correction
@@ -49,7 +50,7 @@ export class PoleService {
 
     const lonLat = toLonLat(coordinate) as [number, number];
     const pole = new Pole(
-      this.state.project.getNextPoleId(), 500, 12, 0, 10,
+      this.state.project.getNextPoleId(), 400, 12, 0, 10,
       new Position(lonLat[0], lonLat[1], 0)
     );
 
@@ -87,6 +88,7 @@ export class PoleService {
     pole.aboveGroundHeight = updated.aboveGroundHeight;
 
     this.state.poleSource.changed();
+    this.state.project.calc();
     this.persistence.saveState();
     this.state.showMessage('success', 'Pole updated.');
   }
@@ -99,24 +101,35 @@ export class PoleService {
    * Renders a single pole as a point feature on the map.
    */
   renderPole(pole: Pole): void {
-    const poleGeometry = PoleService.getPoleDrawing(pole.position.x, pole.position.y);
+    const poleGeometry = PoleService.getPoleDrawing(pole.position.x, pole.position.y, pole.totalConstraint);
 
-    const feature = new Feature({ 
+    const feature = new Feature({
       pole: pole, // <= store the whole pole object in the feature
       geometry: poleGeometry
     });
 
-    feature.setId(`pole-${pole.id}`);    
+    feature.setId(`pole-${pole.id}`);
     this.state.poleSource.addFeature(feature);
   }
 
-  static getPoleDrawing(x: number, y: number): GeometryCollection {
+  static getPoleDrawing(x: number, y: number, totalConstraint: Vector): GeometryCollection {
+    const L = 0.00005;
+    const h = 0.25 * L;
+    const theta = Math.PI / 6;
+    const a = totalConstraint.angle;
+
+    const endX = x + L * Math.cos(a);
+    const endY = y + L * Math.sin(a);
+    const tip1X = endX - h * Math.cos(a - theta);
+    const tip1Y = endY - h * Math.sin(a - theta);
+    const tip2X = endX - h * Math.cos(a + theta);
+    const tip2Y = endY - h * Math.sin(a + theta);
+
     return new GeometryCollection([
       new Point(fromLonLat([x, y])),
-      new LineString([
-        fromLonLat([x, y]),
-        fromLonLat([x + 0.0005, y + 0.0005])
-      ])
+      new LineString([fromLonLat([x, y]), fromLonLat([endX, endY])]),
+      new LineString([fromLonLat([endX, endY]), fromLonLat([tip1X, tip1Y])]),
+      new LineString([fromLonLat([endX, endY]), fromLonLat([tip2X, tip2Y])])
     ]);
   }
 

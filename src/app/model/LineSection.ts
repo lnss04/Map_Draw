@@ -128,12 +128,12 @@ export class LineSection {
     }
 
     public getMechanicalConstraintStartVector(): Vector {
-        const mecanicalConstraintStart = this.line.maxConstraint * this.getStartPoleHangingHeightFactor();
+        const mecanicalConstraintStart = this.line.cable.sectionArea * this.line.maxConstraint * this.getStartPoleHangingHeightFactor();
         return Vector.getVector(mecanicalConstraintStart, this.section.angle);
     }
 
     public getMechanicalConstraintEndVector(): Vector {
-        const mecanicalConstraintEnd = this.line.maxConstraint * this.getEndPoleHangingHeightFactor();
+        const mecanicalConstraintEnd = this.line.cable.sectionArea * this.line.maxConstraint * this.getEndPoleHangingHeightFactor();
         return Vector.getVector(mecanicalConstraintEnd, this.section.angle + Math.PI);
     }
 

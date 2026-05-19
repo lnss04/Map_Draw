@@ -6,7 +6,9 @@
 
 import { Injectable } from '@angular/core';
 import Feature from 'ol/Feature';
-import { Style, Stroke, Icon } from 'ol/style';
+import { Style, Stroke, Icon, Text, Fill, Circle as CircleStyle } from 'ol/style';
+import { GeometryCollection, LineString } from 'ol/geom';
+import Point from 'ol/geom/Point';
 import { MapStateService } from './map-state.service';
 
 @Injectable({
@@ -48,14 +50,12 @@ export class MapStyleService {
   /**
    * Returns a style for a pole feature.
    */
-  getPoleStyle(feature: Feature): Style {
-    // const poleId = feature.get('poleId');
-    // const pole = this.state.project.poles.find(p => p.id === poleId);
+  getPoleStyle(feature: Feature): Style[] {
     const pole = feature.get('pole');
     const rotation = pole.rotation || 0;
     const isSelected = (this.state.selectedPoleId === pole.id);
 
-    return new Style({
+    const iconStyle = new Style({
       image: new Icon({
         src: this.createPoleSVG(rotation, isSelected),
         scale: 1,
@@ -64,11 +64,45 @@ export class MapStyleService {
         anchorYUnits: 'fraction'
       }),
       stroke: new Stroke({
-        color:'#006600',
-        width: 2,
-        lineDash: [1, 1]
+        color: '#ff00dd',
+        width: 2
       })
     });
+
+    const intensity = pole.totalConstraint?.intensity ?? 0;
+    const labelStyle = new Style({
+      geometry: (feat) => {
+        const collection = feat.getGeometry() as GeometryCollection;
+        const shaft = collection.getGeometries()[1] as LineString;
+        return new Point(shaft.getLastCoordinate());
+      },
+      text: new Text({
+        text: intensity.toFixed(0),
+        font: 'bold 12px sans-serif',
+        offsetX: 10,
+        offsetY: -10,
+        textAlign: 'left',
+        fill: new Fill({ color: '#ff00dd' }),
+        stroke: new Stroke({ color: '#ffffff', width: 2 })
+      })
+    });
+
+    const styles: Style[] = [iconStyle, labelStyle];
+
+    if (intensity > 1.4 * pole.strength) {
+      styles.push(new Style({
+        geometry: (feat) => {
+          const collection = feat.getGeometry() as GeometryCollection;
+          return collection.getGeometries()[0] as Point;
+        },
+        image: new CircleStyle({
+          radius: 22,
+          stroke: new Stroke({ color: 'rgba(255, 0, 0, 0.5)', width: 3 })
+        })
+      }));
+    }
+
+    return styles;
   }
 
   // ============================================================

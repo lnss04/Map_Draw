@@ -106,7 +106,7 @@ describe('canton.CalcSectionMechanicalConstraint', () => {
     const startVector = canton.lines[0].lineSections[0].getMechanicalConstraintStartVector();
     const endVector = canton.lines[0].lineSections[0].getMechanicalConstraintEndVector();
     // Assert
-    const res = 10 / (10 - 0.2) * 10;
+    const res = 10 / (10 - 0.2) * 10 * canton.lines[0].cable.sectionArea;
     expect(startVector.intensity).toBeCloseTo(res);
     expect(startVector.angle).toBeCloseTo(0);
     expect(endVector.intensity).toBeCloseTo(res);   
@@ -167,12 +167,12 @@ function createProject(num: number, x: number, y: number): Project {
 function createCan(nbr: number, x: number, y: number): Canton {
   const cable = new Line('ALU 34.4');
   const canton = new Canton(1);
-  const pole1 = new Pole(1, 500, 12, 45, 10, new Position(100, 0, 0));
-  const pole2 = new Pole(2, 500, 12, 45, 10, new Position(0, 0, 0));
+  const pole1 = new Pole(1, 400, 12, 45, 10, new Position(100, 0, 0));
+  const pole2 = new Pole(2, 400, 12, 45, 10, new Position(0, 0, 0));
   canton.addPole(pole1);
   canton.addPole(pole2);
   if (nbr >= 3) {
-    const pole3 = new Pole(3, 500, 12, 45, 10, new Position(x, y, 0));
+    const pole3 = new Pole(3, 400, 12, 45, 10, new Position(x, y, 0));
     canton.addPole(pole3);
   }
   canton.addLine(cable);
@@ -181,8 +181,8 @@ function createCan(nbr: number, x: number, y: number): Canton {
 
 function createCanton(dist: number): Canton {
   const cable = new Line('ALU 34.4');
-  const pole1 = new Pole(1, 500, 12, 45, 10, new Position(0, 0, 0));
-  const pole2 = new Pole(2, 500, 12, 135, 10, new Position(dist, 0, 0));
+  const pole1 = new Pole(1, 400, 12, 45, 10, new Position(0, 0, 0));
+  const pole2 = new Pole(2, 400, 12, 135, 10, new Position(dist, 0, 0));
   const canton = new Canton(1);
   canton.addPole(pole1);
   canton.addPole(pole2);
