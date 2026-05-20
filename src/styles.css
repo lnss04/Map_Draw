@@ -337,6 +337,8 @@ app-canton-edit .modal-content {
 }
 
 .section-grid {
+  display: flex;
+  align-items: stretch;
   width: max-content;
 }
 
@@ -444,6 +446,12 @@ app-canton-edit .modal-content {
 .detail-row    {  }
 .detail-val    { color: #e2e8f0; font-weight: 500; font-family: 'Cascadia Code','Fira Code',monospace; }
 .detail-lbl    { width: 55px; }
+
+/* Bottom-left detail labels: push the 160px label box to the right edge
+   of the left panel so the labels sit directly next to the pole info. */
+.left-panel .section-grid-details { width: 100%; justify-content: flex-end; }
+.left-panel .detail-row           { text-align: right; }
+.left-panel .detail-lbl           { width: auto; }
 .detail-heading {
   font-size: 0.62rem; color: #64748b;
   text-transform: uppercase; letter-spacing: 0.05em;

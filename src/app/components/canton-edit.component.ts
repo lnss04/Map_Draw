@@ -79,35 +79,35 @@ import { RadToDegPipe } from '../pipes/radToDeg';
                   </ng-container>
 
                   <div class="panel-spacer base-spacer"></div>
-                  <div class="section-grid section-grid-details debug">
-                      <div class="grid-cell section-details debug">
+                  <div class="section-grid section-grid-details">
+                      <div class="grid-cell section-details">
                         <div class="mt-2 w-100 small">
                           <div class="detail-row">
-                            <span class="detail-lbl text-secondary">ID: </span>
+                            <span class="detail-lbl text-secondary">Pole ID:</span>
                           </div>
                           <div class="detail-row">
-                            <span class="detail-lbl text-secondary">Height: </span>
+                            <span class="detail-lbl text-secondary">Height:</span>
                           </div>
                           <div class="detail-row">
-                            <span class="detail-lbl text-secondary">Strength: </span>
+                            <span class="detail-lbl text-secondary">Strength:</span>
                           </div>
                           <div class="detail-row">
-                            <span class="detail-lbl text-secondary">Mecha: </span>
+                            <span class="detail-lbl text-secondary">Mechanical:</span>
                           </div>
                           <div class="detail-row">
-                            <span class="detail-lbl text-secondary">Wind: </span>
+                            <span class="detail-lbl text-secondary">Wind:</span>
                           </div>
                           <div class="detail-row">
-                            <span class="detail-lbl text-secondary">Total: </span>
+                            <span class="detail-lbl text-secondary">Total:</span>
                           </div>
                           <div class="detail-row">
-                            <span class="detail-lbl text-secondary">Load: </span>
+                            <span class="detail-lbl text-secondary">Load:</span>
                           </div>
                           <div class="detail-row">
-                            <span class="detail-lbl text-secondary">Height: </span>
+                            <span class="detail-lbl text-secondary">Height:</span>
                           </div>
                           <div class="detail-row">
-                            <span class="detail-lbl text-secondary">Angle: </span>
+                            <span class="detail-lbl text-secondary">Rotation:</span>
                           </div>
                         </div>
                       </div>
@@ -201,9 +201,9 @@ import { RadToDegPipe } from '../pipes/radToDeg';
                   </div>
 
                   <!-- Pole details row: pole metadata and computed constraints -->
-                  <div class="section-grid section-grid-details debug">
+                  <div class="section-grid section-grid-details">
                     <ng-container *ngFor="let pole of canton.poles; let si = index">
-                      <div class="grid-cell section-details debug">
+                      <div class="grid-cell section-details">
                         <div class="mt-2 w-100 small">
                           <div class="detail-row d-flex justify-content-start">
                             <span class="detail-val">{{ pole.id }}</span>
@@ -215,15 +215,18 @@ import { RadToDegPipe } from '../pipes/radToDeg';
                             <span class="detail-val">{{ pole.strength | number:'1.0-0' }} kg</span>
                           </div>
                           <div class="detail-row d-flex justify-content-start">
-                            <span class="detail-val">{{ pole.mechanicalConstraint.intensity | number:'1.0-0' }} daN</span>
+                            <span class="detail-val">{{ pole.mechanicalConstraint.intensity | number:'1.0-0' }}</span>
+                            <span class="detail-val">daN</span>
                             <span class="detail-val">&nbsp;{{ pole.mechanicalConstraint.angle | radToDeg | number:'1.0-0' }}º</span>
                           </div>
                           <div class="detail-row d-flex justify-content-start">
-                            <span class="detail-val">{{ pole.windConstraint.intensity | number:'1.0-0' }} daN</span>
+                            <span class="detail-val">{{ pole.windConstraint.intensity | number:'1.0-0' }}</span>
+                            <span class="detail-val">daN</span>
                             <span class="detail-val">&nbsp;{{ pole.windConstraint.angle | radToDeg | number:'1.0-0' }}º</span>
                           </div>
                           <div class="detail-row d-flex justify-content-start">
-                            <span class="detail-val">{{ pole.totalConstraint.intensity | number:'1.0-0' }} daN</span>
+                            <span class="detail-val">{{ pole.totalConstraint.intensity | number:'1.0-0' }}</span>
+                            <span class="detail-val">daN</span>
                             <span class="detail-val">&nbsp;{{ pole.totalConstraint.angle | radToDeg | number:'1.0-0' }}º</span>
                           </div>
                           <div class="detail-row d-flex justify-content-start">
