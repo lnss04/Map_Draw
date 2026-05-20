@@ -86,6 +86,9 @@ import { RadToDegPipe } from '../pipes/radToDeg';
                             <span class="detail-lbl text-secondary">Pole ID:</span>
                           </div>
                           <div class="detail-row">
+                            <span class="detail-lbl text-secondary">Pole type:</span>
+                          </div>
+                          <div class="detail-row">
                             <span class="detail-lbl text-secondary">Height:</span>
                           </div>
                           <div class="detail-row">
@@ -140,7 +143,7 @@ import { RadToDegPipe } from '../pipes/radToDeg';
                   </div>
 
                   <ng-container *ngFor="let line of lines; let li = index">
-                    <div class="section-grid line-sections-row ">
+                    <div class="section-grid line-sections-row">
                       <div class="pole-spacer d-flex justify-content-end">
                         <img class="half-pole-svg" src="assets/canton-edit/half-pole-right.svg" alt="" />
                       </div>
@@ -205,38 +208,46 @@ import { RadToDegPipe } from '../pipes/radToDeg';
                     <ng-container *ngFor="let pole of canton.poles; let si = index">
                       <div class="grid-cell section-details">
                         <div class="mt-2 w-100 small">
-                          <div class="detail-row d-flex justify-content-start">
+                          <div class="detail-row">
                             <span class="detail-val">{{ pole.id }}</span>
                           </div>
-                          <div class="detail-row d-flex justify-content-start">
-                            <span class="detail-val">{{ pole.aboveGroundHeight | number:'1.0-0' }} m</span>
+                          <div style="text-align: center;">
+                            <span class="detail-val">{{ pole.poleType.value }}</span>
                           </div>
-                          <div class="detail-row d-flex justify-content-start">
-                            <span class="detail-val">{{ pole.strength | number:'1.0-0' }} kg</span>
+                          <div class="detail-row">
+                            <span class="detail-val">{{ pole.aboveGroundHeight | number:'1.0-0' }}</span>
+                            <span class="detail-unit">m</span>
                           </div>
-                          <div class="detail-row d-flex justify-content-start">
+                          <div class="detail-row">
+                            <span class="detail-val">{{ pole.strength | number:'1.0-0' }}</span>
+                            <span class="detail-unit">kg</span>
+                          </div>
+                          <div class="detail-row">
                             <span class="detail-val">{{ pole.mechanicalConstraint.intensity | number:'1.0-0' }}</span>
-                            <span class="detail-val">daN</span>
-                            <span class="detail-val">&nbsp;{{ pole.mechanicalConstraint.angle | radToDeg | number:'1.0-0' }}º</span>
+                            <span class="detail-unit">daN</span>
+                            <span class="detail-angle">{{ pole.mechanicalConstraint.angle | radToDeg | number:'1.0-0' }}º</span>
                           </div>
-                          <div class="detail-row d-flex justify-content-start">
+                          <div class="detail-row">
                             <span class="detail-val">{{ pole.windConstraint.intensity | number:'1.0-0' }}</span>
-                            <span class="detail-val">daN</span>
-                            <span class="detail-val">&nbsp;{{ pole.windConstraint.angle | radToDeg | number:'1.0-0' }}º</span>
+                            <span class="detail-unit">daN</span>
+                            <span class="detail-angle">{{ pole.windConstraint.angle | radToDeg | number:'1.0-0' }}º</span>
                           </div>
-                          <div class="detail-row d-flex justify-content-start">
+                          <div class="detail-row">
                             <span class="detail-val">{{ pole.totalConstraint.intensity | number:'1.0-0' }}</span>
-                            <span class="detail-val">daN</span>
-                            <span class="detail-val">&nbsp;{{ pole.totalConstraint.angle | radToDeg | number:'1.0-0' }}º</span>
+                            <span class="detail-unit">daN</span>
+                            <span class="detail-angle">{{ pole.totalConstraint.angle | radToDeg | number:'1.0-0' }}º</span>
                           </div>
-                          <div class="detail-row d-flex justify-content-start">
-                            <span class="detail-val" [style.color]="pole.critic ? 'red' : 'green'">{{ pole.load * 100 | number:'1.0-0' }} %</span>
+                          <div class="detail-row">
+                            <span class="detail-val" [style.color]="pole.critic ? 'red' : 'green'">{{ pole.load * 100 | number:'1.0-0' }}</span>
+                            <span class="detail-unit">%</span>
                           </div>
-                          <div class="detail-row d-flex justify-content-start">
-                            <span class="detail-val"> {{ pole.aboveGroundHeight | number:'1.0-0' }} m</span>
+                          <div class="detail-row">
+                            <span class="detail-val">{{ pole.aboveGroundHeight | number:'1.0-0' }}</span>
+                            <span class="detail-unit">m</span>
                           </div>
-                          <div class="detail-row d-flex justify-content-start">
-                            <span class="detail-val"> {{ pole.rotation | number:'1.0-0' }}º</span>
+                          <div class="detail-row">
+                            <span class="detail-val">{{ pole.rotation | radToDeg | number:'1.0-0' }}</span>
+                            <span class="detail-unit">º</span>
                           </div>
                         </div>
                       </div>
