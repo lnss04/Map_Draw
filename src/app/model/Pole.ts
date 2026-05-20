@@ -1,10 +1,14 @@
 import { Vector } from "./Vector";
 import { Position } from "./Position";
+import { Calculator } from "../services/Calculator";
+import { appSettings, PoleType } from "../config/AppSettings";
+import { jsonIgnore } from "json-ignore";
 
 export class Pole {
 
-    constructor(id: number, strength: number, height: number, rotation: number, aboveGroundHeight: number, position: Position) {
+    constructor(id: number, type: string, strength: number, height: number, rotation: number, aboveGroundHeight: number, position: Position) {
         this.id = id;
+        this.type = type;
         this.strength = strength;
         this.height = height;
         this.rotation = rotation;
@@ -13,6 +17,8 @@ export class Pole {
     }
 
     public id: number;
+
+    public type: string;
 
     /** Allowable load (kg) */
     public strength: number;
@@ -33,7 +39,20 @@ export class Pole {
     public windConstraint: Vector = new Vector(0, 0);
 
     public totalConstraint: Vector = new Vector(0, 0);
+
+    @jsonIgnore()
+    get poleType(): PoleType {
+      return appSettings.getPoleType(this.type)!;
+    }
+
+    get load(): number {
+        return this.totalConstraint.intensity / (this.strength * Calculator.getStrengthByPoleAngle(this.poleType.symmetric, this.rotation));
+    }
     
+    get critic(): boolean {
+        return this.load >= 1.4;
+    }
+
     /**
      * Euclidean distance to another pole.
      */
@@ -49,6 +68,7 @@ export class Pole {
         const position = Position.fromJSON(json.position);
         const pole = new Pole(
             json.id,
+            json.type,
             json.strength,
             json.height,
             json.rotation,

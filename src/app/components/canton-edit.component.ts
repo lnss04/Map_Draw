@@ -16,11 +16,12 @@ import { Pole } from '../model/Pole';
 import { appSettings, Cable } from '../config/AppSettings';
 import { CantonService } from '../services/canton.service';
 import { MapStateService } from '../services/map-state.service';
+import { RadToDegPipe } from '../pipes/radToDeg';
 
 @Component({
   selector: 'app-canton-edit',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RadToDegPipe],
   template: `
     <div class="edit-overlay" (click)="onBackdropClick($event)">
       <div class="modal-panel modal-dialog modal-dialog-centered" role="dialog">
@@ -56,7 +57,7 @@ import { MapStateService } from '../services/map-state.service';
                         <span>LINE TYPE</span>
                       </div>
                       <div class="grid-cell sh-pole" style="width: 100px;">
-                        <span>MAX LOAD</span>
+                        <span>LOAD [daN/mm&#178;]</span>
                       </div>
                   </div>
 
@@ -78,7 +79,39 @@ import { MapStateService } from '../services/map-state.service';
                   </ng-container>
 
                   <div class="panel-spacer base-spacer"></div>
-                  <div class="panel-spacer details-spacer"></div>
+                  <div class="section-grid section-grid-details debug">
+                      <div class="grid-cell section-details debug">
+                        <div class="mt-2 w-100 small">
+                          <div class="detail-row">
+                            <span class="detail-lbl text-secondary">ID: </span>
+                          </div>
+                          <div class="detail-row">
+                            <span class="detail-lbl text-secondary">Height: </span>
+                          </div>
+                          <div class="detail-row">
+                            <span class="detail-lbl text-secondary">Strength: </span>
+                          </div>
+                          <div class="detail-row">
+                            <span class="detail-lbl text-secondary">Mecha: </span>
+                          </div>
+                          <div class="detail-row">
+                            <span class="detail-lbl text-secondary">Wind: </span>
+                          </div>
+                          <div class="detail-row">
+                            <span class="detail-lbl text-secondary">Total: </span>
+                          </div>
+                          <div class="detail-row">
+                            <span class="detail-lbl text-secondary">Load: </span>
+                          </div>
+                          <div class="detail-row">
+                            <span class="detail-lbl text-secondary">Height: </span>
+                          </div>
+                          <div class="detail-row">
+                            <span class="detail-lbl text-secondary">Angle: </span>
+                          </div>
+                        </div>
+                      </div>
+                  </div>
                 </div>
 
                 <div class="sections-panel">
@@ -123,7 +156,7 @@ import { MapStateService } from '../services/map-state.service';
                                 <!-- Cable curve between the two poles -->
                                 <img class="section-curve" src="assets/canton-edit/section-curve.svg" alt="" />
                                 <!-- Sag value for this linked line section -->
-                                <span class="sag-label">S: {{ ls.sag | number:'1.2-2' }}</span>
+                                <span class="sag-label">S: {{ ls.sag | number:'1.2-2' }} m</span>
                               </div>
                               <!-- Right half of the pole at the end of the section -->
                               <img class="half-pole-svg" src="assets/canton-edit/half-pole-right.svg" alt="" />
@@ -168,37 +201,39 @@ import { MapStateService } from '../services/map-state.service';
                   </div>
 
                   <!-- Pole details row: pole metadata and computed constraints -->
-                  <div class="section-grid section-grid-details">
+                  <div class="section-grid section-grid-details debug">
                     <ng-container *ngFor="let pole of canton.poles; let si = index">
-                      <div class="grid-cell section-details">
+                      <div class="grid-cell section-details debug">
                         <div class="mt-2 w-100 small">
                           <div class="detail-row d-flex justify-content-start">
-                            <span class="detail-lbl text-secondary">ID: </span>
                             <span class="detail-val">{{ pole.id }}</span>
                           </div>
                           <div class="detail-row d-flex justify-content-start">
-                            <span class="detail-lbl text-secondary">Height: </span>
                             <span class="detail-val">{{ pole.aboveGroundHeight | number:'1.0-0' }} m</span>
                           </div>
                           <div class="detail-row d-flex justify-content-start">
-                            <span class="detail-lbl text-secondary">Strength: </span>
                             <span class="detail-val">{{ pole.strength | number:'1.0-0' }} kg</span>
                           </div>
-                          <div class="detail-heading">Constraints</div>
                           <div class="detail-row d-flex justify-content-start">
-                            <span class="detail-lbl text-secondary">Mech: </span>
                             <span class="detail-val">{{ pole.mechanicalConstraint.intensity | number:'1.0-0' }} daN</span>
-                            <span class="detail-val">&nbsp;{{ pole.mechanicalConstraint.angle | number:'1.0-0' }}º</span>
+                            <span class="detail-val">&nbsp;{{ pole.mechanicalConstraint.angle | radToDeg | number:'1.0-0' }}º</span>
                           </div>
                           <div class="detail-row d-flex justify-content-start">
-                            <span class="detail-lbl text-secondary">Wind: </span>
                             <span class="detail-val">{{ pole.windConstraint.intensity | number:'1.0-0' }} daN</span>
-                            <span class="detail-val">&nbsp;{{ pole.windConstraint.angle | number:'1.0-0' }}º</span>
+                            <span class="detail-val">&nbsp;{{ pole.windConstraint.angle | radToDeg | number:'1.0-0' }}º</span>
                           </div>
                           <div class="detail-row d-flex justify-content-start">
-                            <span class="detail-lbl text-secondary">Total: </span>
                             <span class="detail-val">{{ pole.totalConstraint.intensity | number:'1.0-0' }} daN</span>
-                            <span class="detail-val">&nbsp;{{ pole.totalConstraint.angle | number:'1.0-0' }}º</span>
+                            <span class="detail-val">&nbsp;{{ pole.totalConstraint.angle | radToDeg | number:'1.0-0' }}º</span>
+                          </div>
+                          <div class="detail-row d-flex justify-content-start">
+                            <span class="detail-val" [style.color]="pole.critic ? 'red' : 'green'">{{ pole.load * 100 | number:'1.0-0' }} %</span>
+                          </div>
+                          <div class="detail-row d-flex justify-content-start">
+                            <span class="detail-val"> {{ pole.aboveGroundHeight | number:'1.0-0' }} m</span>
+                          </div>
+                          <div class="detail-row d-flex justify-content-start">
+                            <span class="detail-val"> {{ pole.rotation | number:'1.0-0' }}º</span>
                           </div>
                         </div>
                       </div>
@@ -270,6 +305,7 @@ export class CantonEditComponent implements OnChanges {
   /** Add a new line (Type-A by default) and register it with the canton */
   addLine(): void {
     const line = new Line('ALU 34.4');
+    line.maxConstraint = line.cable.maxConstraint;
     this.canton.addLine(line);
     this.cantonService.updateCanton(this.canton);
   }

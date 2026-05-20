@@ -208,4 +208,19 @@ export class Calculator {
         const constraint2 = solveCubic(1, p3, 0, -p0);
         return constraint2;
     }
+
+    public static getStrengthByPoleAngle(symmetric:number, angle: number): number {
+        angle = Math.abs(angle);
+        const h = Math.PI/2;
+        switch(symmetric) {
+            case 0:
+                return 1.0;
+            case 1:
+                return angle <= h ? 1.0 - 0.4 * angle / h : 0.6 + 0.4 * (angle - h) / h;
+            case 2:
+                return angle <= h ? 1.0 - 0.4 * angle / h : 0.6 - 0.1 * (angle - h) / h;
+            default:
+                throw new Error(`symmetric ${symmetric} not supported`);
+        }
+    }
 }

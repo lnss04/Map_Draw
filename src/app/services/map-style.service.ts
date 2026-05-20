@@ -36,7 +36,7 @@ export class MapStyleService {
     const lineY = -halfH - 4;
 
     const svg = '<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="-20 -20 40 40">' +
-      '<g transform="rotate(' + rotation + ')">' +
+      '<g transform="rotate(' + ((-rotation * 180 / Math.PI) + 90) + ')">' +
         '<rect x="' + (-halfW) + '" y="' + (-halfH) + '" width="' + width + '" height="' + height + '" ' +
               'fill="' + fillColor + '" stroke="' + strokeColor + '" stroke-width="' + strokeWidth + '" rx="2" ry="2"/>' +
         '<line x1="0" y1="' + (-halfH) + '" x2="0" y2="' + lineY + '" ' +
@@ -77,7 +77,7 @@ export class MapStyleService {
         return new Point(shaft.getLastCoordinate());
       },
       text: new Text({
-        text: intensity.toFixed(0),
+        text: `${intensity.toFixed(0)} daN`,
         font: 'bold 12px sans-serif',
         offsetX: 10,
         offsetY: -10,
@@ -89,7 +89,7 @@ export class MapStyleService {
 
     const styles: Style[] = [iconStyle, labelStyle];
 
-    if (intensity > 1.4 * pole.strength) {
+    if (pole.critic) {
       styles.push(new Style({
         geometry: (feat) => {
           const collection = feat.getGeometry() as GeometryCollection;

@@ -90,8 +90,14 @@ export class Project {
         });
     }
 
-    calcSag(): void {
-        
+    calcSag(): void {        
+        const lineSections = this.getAllLineSections();
+        lineSections.forEach(ls => {
+            const w = ls.line.cable.specificWeight;
+            const length = ls.section.length;
+            const T = ls.line.maxConstraint;
+            ls.sag = w * length * length / (T * 8);
+        });
     }
 
     calc(): void {

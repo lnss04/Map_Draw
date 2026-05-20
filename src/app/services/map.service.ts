@@ -453,10 +453,10 @@ export class MapService implements OnDestroy {
     const poleCoord = fromLonLat([pole.position.x, pole.position.y]);
     const dx = coordinate[0] - poleCoord[0];
     const dy = coordinate[1] - poleCoord[1];
-    let angle = Math.atan2(dx, dy) * (180 / Math.PI);
-    if (angle < 0) angle += 360;
+    let angle = Math.atan2(dx, dy);
+    if (angle < 0) angle += 2 * Math.PI;
 
-    pole.rotation = Math.round(angle);
+    pole.rotation = angle + Math.PI / 2;
     this.updateLever();
     this.state.poleSource.changed();
 
@@ -474,11 +474,10 @@ export class MapService implements OnDestroy {
     if (!pole) return;
 
     const poleCoord = fromLonLat([pole.position.x, pole.position.y]);
-    const rotation = pole.rotation || 0;
+    const rotation = (pole.rotation || 0) - Math.PI / 2;
     const leverDistance = this.state.map.getView().getResolution()! * 40;
-    const angleRad = rotation * (Math.PI / 180);
-    const leverX = poleCoord[0] + leverDistance * Math.sin(angleRad);
-    const leverY = poleCoord[1] + leverDistance * Math.cos(angleRad);
+    const leverX = poleCoord[0] + leverDistance * Math.sin(rotation);
+    const leverY = poleCoord[1] + leverDistance * Math.cos(rotation);
 
     const leverFeature = new Feature({
       geometry: new Point([leverX, leverY])

@@ -50,7 +50,7 @@ export class PoleService {
 
     const lonLat = toLonLat(coordinate) as [number, number];
     const pole = new Pole(
-      this.state.project.getNextPoleId(), 400, 12, 0, 10,
+      this.state.project.getNextPoleId(), 'S', 400, 12, 0, 10,
       new Position(lonLat[0], lonLat[1], 0)
     );
 
@@ -86,6 +86,7 @@ export class PoleService {
     pole.height = updated.height;
     pole.rotation = updated.rotation;
     pole.aboveGroundHeight = updated.aboveGroundHeight;
+    pole.type = updated.type;
 
     this.state.poleSource.changed();
     this.state.project.calc();
@@ -113,7 +114,7 @@ export class PoleService {
   }
 
   static getPoleDrawing(x: number, y: number, totalConstraint: Vector): GeometryCollection {
-    const L = 0.00005;
+    const L = 0.0002;
     const h = 0.25 * L;
     const theta = Math.PI / 6;
     const a = totalConstraint.angle;

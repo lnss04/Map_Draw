@@ -100,6 +100,8 @@ export class CantonService {
     this.state.selectedCantonId = null;
     this.state.project.calc();
     this.persistence.saveState();
+    this.state.cantonSource.changed();
+    this.state.poleSource.changed();
     this.state.updateStats();
     this.state.showMessage('success', 'Canton removed.');
   }
@@ -110,6 +112,8 @@ export class CantonService {
   updateCanton(updated: Canton): void {
     this.state.project.calc();
     this.persistence.saveState();
+    this.state.cantonSource.changed();
+    this.state.poleSource.changed();
     this.state.showMessage('success', 'Canton saved.');
   }
 
