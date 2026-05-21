@@ -90,25 +90,25 @@ import { RadToDegPipe } from '../pipes/radToDeg';
                             <span class="detail-lbl text-secondary">Pole type:</span>
                           </div>
                           <div class="detail-row">
-                            <span class="detail-lbl text-secondary">Height:</span>
+                            <span class="detail-lbl text-secondary">Pole above ground height:</span>
                           </div>
                           <div class="detail-row">
-                            <span class="detail-lbl text-secondary">Strength:</span>
+                            <span class="detail-lbl text-secondary">Pole total height:</span>
                           </div>
                           <div class="detail-row">
-                            <span class="detail-lbl text-secondary">Mechanical:</span>
+                            <span class="detail-lbl text-secondary">Pole strength:</span>
                           </div>
                           <div class="detail-row">
-                            <span class="detail-lbl text-secondary">Wind:</span>
+                            <span class="detail-lbl text-secondary">Mechanical constraint:</span>
                           </div>
                           <div class="detail-row">
-                            <span class="detail-lbl text-secondary">Total:</span>
+                            <span class="detail-lbl text-secondary">Wind constraint:</span>
+                          </div>
+                          <div class="detail-row">
+                            <span class="detail-lbl text-secondary">Total constraint:</span>
                           </div>
                           <div class="detail-row">
                             <span class="detail-lbl text-secondary">Load:</span>
-                          </div>
-                          <div class="detail-row">
-                            <span class="detail-lbl text-secondary">Height:</span>
                           </div>
                           <div class="detail-row">
                             <span class="detail-lbl text-secondary">Rotation:</span>
@@ -220,6 +220,10 @@ import { RadToDegPipe } from '../pipes/radToDeg';
                             <span class="detail-unit">m</span>
                           </div>
                           <div class="detail-row">
+                            <span class="detail-val">{{ pole.height | number:'1.0-0' }}</span>
+                            <span class="detail-unit">m</span>
+                          </div>
+                          <div class="detail-row">
                             <span class="detail-val">{{ pole.strength | number:'1.0-0' }}</span>
                             <span class="detail-unit">kg</span>
                           </div>
@@ -241,10 +245,6 @@ import { RadToDegPipe } from '../pipes/radToDeg';
                           <div class="detail-row">
                             <span class="detail-val" [style.color]="pole.critic ? 'red' : 'green'">{{ pole.load * 100 | number:'1.0-0' }}</span>
                             <span class="detail-unit">%</span>
-                          </div>
-                          <div class="detail-row">
-                            <span class="detail-val">{{ pole.aboveGroundHeight | number:'1.0-0' }}</span>
-                            <span class="detail-unit">m</span>
                           </div>
                           <div class="detail-row">
                             <span class="detail-val">{{ pole.rotation | radToDeg | number:'1.0-0' }}</span>
