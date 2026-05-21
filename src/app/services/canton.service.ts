@@ -98,10 +98,9 @@ export class CantonService {
     const feature = this.state.cantonSource.getFeatureById(`canton-${cantonId}`);
     if (feature) this.state.cantonSource.removeFeature(feature);
     this.state.selectedCantonId = null;
-    this.state.project.calc();
+    this.poleService.recalculate();
     this.persistence.saveState();
     this.state.cantonSource.changed();
-    this.state.poleSource.changed();
     this.state.updateStats();
     this.state.showMessage('success', 'Canton removed.');
   }
@@ -110,10 +109,9 @@ export class CantonService {
    * Applies edited canton data and persists.
    */
   updateCanton(updated: Canton): void {
-    this.state.project.calc();
+    this.poleService.recalculate();
     this.persistence.saveState();
     this.state.cantonSource.changed();
-    this.state.poleSource.changed();
     this.state.showMessage('success', 'Canton saved.');
   }
 
@@ -146,7 +144,8 @@ export class CantonService {
   refreshCantonFeatures(): void {
     this.state.cantonSource.clear();
     this.state.project.cantons.forEach(canton => this.renderCanton(canton));
-    //TO DO: add calc();
+    // Constraints are recalculated and pole arrows redrawn when the
+    // move/rotate gesture ends (see MapService.recalculatePoles).
   }
 
   // ============================================================

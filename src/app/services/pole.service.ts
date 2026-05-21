@@ -10,6 +10,7 @@ import { fromLonLat, toLonLat } from 'ol/proj';
 import { Pole } from '../model/Pole';
 import { MapStateService } from './map-state.service';
 import { MapPersistenceService } from './map-persistence.service';
+import { MapStyleService } from './map-style.service';
 import { Position } from '../model/Position';
 import { GeometryCollection, LineString } from 'ol/geom';
 import { Vector } from '../model/Vector';
@@ -24,7 +25,8 @@ export class PoleService {
 
   constructor(
     private state: MapStateService,
-    private persistence: MapPersistenceService
+    private persistence: MapPersistenceService,
+    private style: MapStyleService
   ) {}
 
   // ============================================================
@@ -88,8 +90,7 @@ export class PoleService {
     pole.aboveGroundHeight = updated.aboveGroundHeight;
     pole.type = updated.type;
 
-    this.state.poleSource.changed();
-    this.state.project.calc();
+    this.recalculate();
     this.persistence.saveState();
     this.state.showMessage('success', 'Pole updated.');
   }
@@ -111,6 +112,30 @@ export class PoleService {
 
     feature.setId(`pole-${pole.id}`);
     this.state.poleSource.addFeature(feature);
+  }
+
+  /**
+   * Recomputes span geometry, recalculates all constraints, and redraws every
+   * pole arrow. This is the single entry point to call after anything that can
+   * change pole positions, span geometry, or line/pole properties.
+   */
+  recalculate(): void {
+    this.style.recomputeSections(this.state.project.getAllSections());
+    this.state.project.calc();
+    this.redrawAllPoles();
+  }
+
+  /**
+   * Clears and re-renders every pole feature.
+   *
+   * The arrow (shaft + tip) is baked into each feature's geometry from the
+   * pole's totalConstraint at render time, so simply calling
+   * `poleSource.changed()` re-styles but leaves the arrow direction stale.
+   * Call this after `project.calc()` so the arrows reflect the new constraints.
+   */
+  redrawAllPoles(): void {
+    this.state.poleSource.clear();
+    this.state.project.poles.forEach(pole => this.renderPole(pole));
   }
 
   static getPoleDrawing(x: number, y: number, totalConstraint: Vector): GeometryCollection {

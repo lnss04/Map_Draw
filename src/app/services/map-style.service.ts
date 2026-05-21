@@ -10,6 +10,7 @@ import { Style, Stroke, Icon, Text, Fill, Circle as CircleStyle } from 'ol/style
 import { GeometryCollection, LineString } from 'ol/geom';
 import Point from 'ol/geom/Point';
 import { MapStateService } from './map-state.service';
+import { Section } from '../model/Section';
 
 @Injectable({
   providedIn: 'root'
@@ -17,6 +18,34 @@ import { MapStateService } from './map-state.service';
 export class MapStyleService {
 
   constructor(private state: MapStateService) {}
+
+  // ============================================================
+  // SECTION GEOMETRY
+  // ============================================================
+
+  /**
+   * Re-derives a section's span length and angle from its poles' current positions.
+   * Must run before constraints are recalculated so the arrows reflect any pole moves.
+   */
+  recomputeSection(section: Section): void {
+    const a = section.startPole.position;
+    const b = section.endPole.position;
+    const R = 6371000; // Earth radius in metres
+    const lat1 = a.y * Math.PI / 180;
+    const lat2 = b.y * Math.PI / 180;
+    const dLat = (b.y - a.y) * Math.PI / 180;
+    const dLon = (b.x - a.x) * Math.PI / 180;
+    const h = Math.sin(dLat / 2) ** 2 + Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLon / 2) ** 2;
+    const horizontal = 2 * R * Math.atan2(Math.sqrt(h), Math.sqrt(1 - h));
+    const dz = b.z - a.z;
+    section.length = Math.sqrt(horizontal * horizontal + dz * dz);
+    section.angle = Math.atan2(b.y - a.y, b.x - a.x);
+  }
+
+  /** Re-derives every supplied section's span length and angle. */
+  recomputeSections(sections: Section[]): void {
+    sections.forEach(section => this.recomputeSection(section));
+  }
 
   // ============================================================
   // POLE STYLING

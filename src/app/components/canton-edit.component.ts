@@ -16,6 +16,7 @@ import { Pole } from '../model/Pole';
 import { appSettings, Cable } from '../config/AppSettings';
 import { CantonService } from '../services/canton.service';
 import { MapStateService } from '../services/map-state.service';
+import { MapStyleService } from '../services/map-style.service';
 import { RadToDegPipe } from '../pipes/radToDeg';
 
 @Component({
@@ -292,7 +293,8 @@ export class CantonEditComponent implements OnChanges {
 
   constructor(
     private cantonService: CantonService,
-    private mapStateService: MapStateService
+    private mapStateService: MapStateService,
+    private mapStyleService: MapStyleService
   ) { }
 
   totalLength = 0;
@@ -311,7 +313,7 @@ export class CantonEditComponent implements OnChanges {
 
   ngOnChanges(): void {
     if (this.canton) {
-      this.canton.sections.forEach(s => s.recompute());
+      this.mapStyleService.recomputeSections(this.canton.sections);
       this.totalLength = this.canton.sections.reduce((sum, s) => sum + s.length, 0);
     }
   }

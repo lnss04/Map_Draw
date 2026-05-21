@@ -225,6 +225,7 @@ export class MapService implements OnDestroy {
         if (this.state.dragPanInteraction) {
           this.state.dragPanInteraction.setActive(true);
         }
+        this.recalculatePoles();
         this.persistence.saveState();
         this.state.showMessage('success', 'Pole rotation updated.');
       }
@@ -233,6 +234,7 @@ export class MapService implements OnDestroy {
         if (this.state.dragPanInteraction) {
           this.state.dragPanInteraction.setActive(true);
         }
+        this.recalculatePoles();
         this.persistence.saveState();
         this.state.showMessage('success', 'Pole moved successfully.');
       }
@@ -620,5 +622,15 @@ export class MapService implements OnDestroy {
   private renderAllFeatures(): void {
     this.state.project.poles.forEach(pole => this.poleService.renderPole(pole));
     this.state.project.cantons.forEach(canton => this.cantonService.renderCanton(canton));
+  }
+
+  /**
+   * Recomputes all constraints and redraws every pole arrow.
+   * Moving or rotating a pole changes span lengths/angles, so the total
+   * constraint (and thus the arrow) of every connected pole can change —
+   * not just the dragged one. Called when a move/rotate gesture ends.
+   */
+  private recalculatePoles(): void {
+    this.poleService.recalculate();
   }
 }

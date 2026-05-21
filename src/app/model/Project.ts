@@ -1,6 +1,7 @@
 import { Canton } from './Canton';
 import { LineSection } from './LineSection';
 import { Pole } from './Pole';
+import { Section } from './Section';
 import { Vector } from './Vector';
 
 /**
@@ -65,6 +66,10 @@ export class Project {
 
     getAllLineSections(): LineSection[] {
         return this.cantons.flatMap(canton => canton.sections.flatMap(section => section.lineSections));
+    }
+
+    getAllSections(): Section[] {
+        return this.cantons.flatMap(canton => canton.sections);
     }
 
     calcWindConstraint(): void {
