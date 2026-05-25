@@ -6,7 +6,6 @@
 import { Injectable } from '@angular/core';
 import Feature from 'ol/Feature';
 import Point from 'ol/geom/Point';
-import { fromLonLat, toLonLat } from 'ol/proj';
 import { Pole } from '../model/Pole';
 import { MapStateService } from './map-state.service';
 import { MapPersistenceService } from './map-persistence.service';
@@ -14,9 +13,9 @@ import { MapStyleService } from './map-style.service';
 import { Position } from '../model/Position';
 import { GeometryCollection, LineString } from 'ol/geom';
 import { Vector } from '../model/Vector';
+import { lambertToMap, mapToLambert } from './projection';
 
 const MIN_POLE_DISTANCE_METERS = 0.5; // 50cm minimum distance between poles
-const DEFAULT_CENTER_LAT = 50.8503;   // Brussels latitude for distance correction
 
 @Injectable({
   providedIn: 'root'
@@ -38,11 +37,12 @@ export class PoleService {
    * Validates minimum distance from existing poles.
    */
   addPole(coordinate: [number, number]): void {
+    const lambert = mapToLambert(coordinate);
 
     const tooClose = this.state.project.poles.some(pole => {
-      const poleCoord = fromLonLat([pole.position.x, pole.position.y]) as [number, number];
-      const distance = this.calculateDistance(coordinate, poleCoord);
-      return distance < MIN_POLE_DISTANCE_METERS;
+      const dx = lambert[0] - pole.position.x;
+      const dy = lambert[1] - pole.position.y;
+      return Math.sqrt(dx * dx + dy * dy) < MIN_POLE_DISTANCE_METERS;
     });
 
     if (tooClose) {
@@ -50,10 +50,9 @@ export class PoleService {
       return;
     }
 
-    const lonLat = toLonLat(coordinate) as [number, number];
     const pole = new Pole(
       this.state.project.getNextPoleId(), 'S', 400, 12, 0, 10,
-      new Position(lonLat[0], lonLat[1], 0)
+      new Position(lambert[0], lambert[1], 0)
     );
 
     this.state.project.poles.push(pole);
@@ -81,14 +80,15 @@ export class PoleService {
    */
   updatePole(updated: Pole): void {
     const pole = this.state.project.poles.find(p => p.id === updated.id);
-    
+
     if (!pole) return;
-    
+
     pole.strength = updated.strength;
     pole.height = updated.height;
     pole.rotation = updated.rotation;
     pole.aboveGroundHeight = updated.aboveGroundHeight;
     pole.type = updated.type;
+    pole.position = updated.position;
 
     this.recalculate();
     this.persistence.saveState();
@@ -139,7 +139,7 @@ export class PoleService {
   }
 
   static getPoleDrawing(x: number, y: number, totalConstraint: Vector): GeometryCollection {
-    const L = 0.0002;
+    const L = 20; // arrow length in metres (Lambert 72)
     const h = 0.25 * L;
     const theta = Math.PI / 6;
     const a = totalConstraint.angle;
@@ -152,10 +152,10 @@ export class PoleService {
     const tip2Y = endY - h * Math.sin(a + theta);
 
     return new GeometryCollection([
-      new Point(fromLonLat([x, y])),
-      new LineString([fromLonLat([x, y]), fromLonLat([endX, endY])]),
-      new LineString([fromLonLat([endX, endY]), fromLonLat([tip1X, tip1Y])]),
-      new LineString([fromLonLat([endX, endY]), fromLonLat([tip2X, tip2Y])])
+      new Point(lambertToMap(x, y)),
+      new LineString([lambertToMap(x, y), lambertToMap(endX, endY)]),
+      new LineString([lambertToMap(endX, endY), lambertToMap(tip1X, tip1Y)]),
+      new LineString([lambertToMap(endX, endY), lambertToMap(tip2X, tip2Y)])
     ]);
   }
 
@@ -173,7 +173,7 @@ export class PoleService {
     const tolerance = this.state.map.getView().getResolution()! * 10; // 10 pixels tolerance
 
     for (const pole of this.state.project.poles) {
-      const poleCoord = fromLonLat([pole.position.x, pole.position.y]);
+      const poleCoord = lambertToMap(pole.position.x, pole.position.y);
       const dx = coordinate[0] - poleCoord[0];
       const dy = coordinate[1] - poleCoord[1];
       const distance = Math.sqrt(dx * dx + dy * dy);
@@ -183,21 +183,5 @@ export class PoleService {
       }
     }
     return null;
-  }
-
-  // ============================================================
-  // UTILITIES
-  // ============================================================
-
-  /**
-   * Approximate true distance (metres) between two EPSG:3857 coordinates.
-   * EPSG:3857 pseudometres are stretched by 1/cos(lat) relative to real metres;
-   * multiplying back by cos(lat) converts them to real-world metres.
-   */
-  private calculateDistance(coord1: [number, number], coord2: [number, number]): number {
-    const dx = coord1[0] - coord2[0];
-    const dy = coord1[1] - coord2[1];
-    const latRad = DEFAULT_CENTER_LAT * Math.PI / 180;
-    return Math.sqrt(dx * dx + dy * dy) * Math.cos(latRad);
   }
 }

@@ -6,7 +6,7 @@
 import { Injectable } from '@angular/core';
 import Feature from 'ol/Feature';
 import LineString from 'ol/geom/LineString';
-import { fromLonLat } from 'ol/proj';
+import { lambertToMap } from './projection';
 import { Canton } from '../model/Canton';
 import { Pole } from '../model/Pole';
 import { MapStateService } from './map-state.service';
@@ -126,7 +126,7 @@ export class CantonService {
     const coordinates = canton.poleIds
       .map(id => this.state.project.poles.find(p => p.id === id))
       .filter((p): p is Pole => p !== undefined)
-      .map(p => fromLonLat([p.position.x, p.position.y]));
+      .map(p => lambertToMap(p.position.x, p.position.y));
 
     if (coordinates.length < 2) return;
 
@@ -164,7 +164,7 @@ export class CantonService {
     const coordinates = this.state.cantonPoleIds
       .map(id => this.state.project.poles.find(p => p.id === id))
       .filter((p): p is Pole => p !== undefined)
-      .map(p => fromLonLat([p.position.x, p.position.y]));
+      .map(p => lambertToMap(p.position.x, p.position.y));
 
     // Add current mouse position if available
     if (this.state.lastMousePosition) {

@@ -30,16 +30,8 @@ export class MapStyleService {
   recomputeSection(section: Section): void {
     const a = section.startPole.position;
     const b = section.endPole.position;
-    const R = 6371000; // Earth radius in metres
-    const lat1 = a.y * Math.PI / 180;
-    const lat2 = b.y * Math.PI / 180;
-    const dLat = (b.y - a.y) * Math.PI / 180;
-    const dLon = (b.x - a.x) * Math.PI / 180;
-    const h = Math.sin(dLat / 2) ** 2 + Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLon / 2) ** 2;
-    const horizontal = 2 * R * Math.atan2(Math.sqrt(h), Math.sqrt(1 - h));
-    const dz = b.z - a.z;
-    section.length = Math.sqrt(horizontal * horizontal + dz * dz);
-    section.angle = Math.atan2(b.y - a.y, b.x - a.x);
+    section.length = a.distanceTo(b);
+    section.angle = a.angleTo(b);
   }
 
   /** Re-derives every supplied section's span length and angle. */

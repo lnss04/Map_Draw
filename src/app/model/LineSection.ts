@@ -142,13 +142,13 @@ export class LineSection {
         const diameter = this.line.cable.diameter/1000;
         const windForcePerMeter = Calculator.getWindForcePerMeter(diameter);
         const windForce = windForcePerMeter * this.section.length;
-        return windForce / this.getStartPoleHangingHeightFactor() * Math.sin(angle) / 2;
+        return windForce / this.getStartPoleHangingHeightFactor() * Math.abs(Math.sin(angle)) / 2;
     }
     getWindConstraintEndVector(windAngle: number): number {
         const angle = this.section.angle - windAngle;
         const diameter = this.line.cable.diameter/1000;
         const windForcePerMeter = Calculator.getWindForcePerMeter(diameter);
         const windForce = windForcePerMeter * this.section.length;
-        return windForce / this.getEndPoleHangingHeightFactor() * Math.sin(angle) / 2;
+        return windForce / this.getEndPoleHangingHeightFactor() * Math.abs(Math.sin(angle)) / 2;
     }
 }

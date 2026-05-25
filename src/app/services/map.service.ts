@@ -11,13 +11,12 @@ import TileLayer from 'ol/layer/Tile';
 import VectorLayer from 'ol/layer/Vector';
 import VectorSource from 'ol/source/Vector';
 import OSM from 'ol/source/OSM';
-import { fromLonLat, toLonLat } from 'ol/proj';
+import { fromLonLat } from 'ol/proj';
 import Feature from 'ol/Feature';
 import Point from 'ol/geom/Point';
 import ScaleLine from 'ol/control/ScaleLine';
 import { DragPan } from 'ol/interaction';
 import { MapBrowserEvent } from 'ol';
-import proj4 from 'proj4';
 import { Canton } from '../model/Canton';
 import { Pole } from '../model/Pole';
 import { Position } from '../model/Position';
@@ -27,17 +26,10 @@ import { MapStyleService } from './map-style.service';
 import { MapPersistenceService } from './map-persistence.service';
 import { PoleService } from './pole.service';
 import { CantonService } from './canton.service';
+import { lambertToMap, mapToLambert } from './projection';
 import { GeometryCollection } from 'ol/geom';
 
 export { DrawingMode } from './map-state.service';
-
-// ============================================================
-// LAMBERT 72 PROJECTION (EPSG:31370)
-// ============================================================
-
-const LAMBERT_72_PROJ = '+proj=lcc +lat_1=51.16666723333333 +lat_2=49.8333339 +lat_0=90 +lon_0=4.367486666666666 +x_0=150000.013 +y_0=5400088.438 +ellps=intl +towgs84=-106.8686,52.2978,-103.7239,0.3366,-0.457,1.8422,-1.2747 +units=m +no_defs';
-
-proj4.defs('EPSG:31370', LAMBERT_72_PROJ);
 
 const DEFAULT_CENTER: [number, number] = [3.957044, 50.461443]; // Brussels, Belgium
 const DEFAULT_ZOOM = 18;
@@ -143,8 +135,7 @@ export class MapService implements OnDestroy {
 
     // Track mouse position for coordinates display and temp line
     map.on('pointermove', (event) => {
-      const lonLat = toLonLat(event.coordinate);
-      const lambert72 = proj4('EPSG:4326', 'EPSG:31370', lonLat);
+      const lambert72 = mapToLambert(event.coordinate as [number, number]);
       this.state.setCursorCoords(`Lambert 72: X=${lambert72[0].toFixed(2)} m, Y=${lambert72[1].toFixed(2)} m`);
 
       if (this.state.currentMode === 'canton' && this.state.cantonPoleIds.length > 0) {
@@ -438,9 +429,9 @@ export class MapService implements OnDestroy {
     const feature = this.state.poleSource.getFeatureById(`pole-${this.state.selectedPoleId}`) as Feature;
     if (feature) {
       const pole = feature.get('pole');
-      const lonLat = toLonLat(coordinate) as [number, number];
-      pole.position = new Position(lonLat[0], lonLat[1], pole.position.z);
-      feature.setGeometry(PoleService.getPoleDrawing(lonLat[0], lonLat[1], pole.totalConstraint));
+      const lambert = mapToLambert(coordinate);
+      pole.position = new Position(lambert[0], lambert[1], pole.position.z);
+      feature.setGeometry(PoleService.getPoleDrawing(lambert[0], lambert[1], pole.totalConstraint));
     }
     this.cantonService.refreshCantonFeatures();
   }
@@ -452,7 +443,7 @@ export class MapService implements OnDestroy {
     const pole = this.state.project.poles.find(p => p.id === this.state.selectedPoleId);
     if (!pole) return;
 
-    const poleCoord = fromLonLat([pole.position.x, pole.position.y]);
+    const poleCoord = lambertToMap(pole.position.x, pole.position.y);
     const dx = coordinate[0] - poleCoord[0];
     const dy = coordinate[1] - poleCoord[1];
     let angle = Math.atan2(dx, dy);
@@ -462,7 +453,7 @@ export class MapService implements OnDestroy {
     this.updateLever();
     this.state.poleSource.changed();
 
-    this.cantonService.refreshCantonFeatures();    
+    this.cantonService.refreshCantonFeatures();
   }
 
   /**
@@ -475,7 +466,7 @@ export class MapService implements OnDestroy {
     const pole = this.state.project.poles.find(p => p.id === this.state.selectedPoleId);
     if (!pole) return;
 
-    const poleCoord = fromLonLat([pole.position.x, pole.position.y]);
+    const poleCoord = lambertToMap(pole.position.x, pole.position.y);
     const rotation = (pole.rotation || 0) - Math.PI / 2;
     const leverDistance = this.state.map.getView().getResolution()! * 40;
     const leverX = poleCoord[0] + leverDistance * Math.sin(rotation);
@@ -583,6 +574,7 @@ export class MapService implements OnDestroy {
   /** Applies edited pole data and persists. */
   updatePole(updated: Pole): void {
     this.poleService.updatePole(updated);
+    this.cantonService.refreshCantonFeatures();
   }
 
   /** Applies edited canton data and persists. */

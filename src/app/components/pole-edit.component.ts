@@ -8,6 +8,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { appSettings, PoleType } from "../config/AppSettings";
 import { Pole } from '../model/Pole';
+import { Position } from '../model/Position';
 
 @Component({
   selector: 'app-pole-edit',
@@ -41,12 +42,24 @@ import { Pole } from '../model/Pole';
 
             <div class="row g-3">
               <div class="col-12 col-md-6">
-                <label class="form-label text-uppercase small text-secondary fw-semibold">Position X (lon)</label>
-                <div class="form-control form-control-sm field-readonly">{{ draft.position.x | number:'1.6-6' }}</div>
+                <label class="form-label text-uppercase small text-secondary fw-semibold" for="polePosX">Position X (Lambert 72, m)</label>
+                <input
+                  id="polePosX"
+                  type="number"
+                  class="form-control form-control-sm"
+                  [(ngModel)]="draft.position.x"
+                  step="0.01"
+                />
               </div>
               <div class="col-12 col-md-6">
-                <label class="form-label text-uppercase small text-secondary fw-semibold">Position Y (lat)</label>
-                <div class="form-control form-control-sm field-readonly">{{ draft.position.y | number:'1.6-6' }}</div>
+                <label class="form-label text-uppercase small text-secondary fw-semibold" for="polePosY">Position Y (Lambert 72, m)</label>
+                <input
+                  id="polePosY"
+                  type="number"
+                  class="form-control form-control-sm"
+                  [(ngModel)]="draft.position.y"
+                  step="0.01"
+                />
               </div>
             </div>
 
@@ -155,6 +168,7 @@ export class PoleEditComponent implements OnInit {
   }
 
   save(): void {
+    this.draft.position = new Position(this.draft.position.x, this.draft.position.y, this.draft.position.z);
     this.saved.emit(this.draft);
   }
 

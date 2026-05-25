@@ -81,10 +81,10 @@ export class Project {
                 const angle = a * Math.PI / 180;
                 const reduceStart = lsStartList.map(ls => ls.getWindConstraintStartVector(angle)).reduce((acc, v) => acc + v, 0);
                 const reduceEnd = lsEndList.map(ls => ls.getWindConstraintEndVector(angle)).reduce((acc, v) => acc + v, 0);
-                const windConstraint = reduceStart + reduceEnd;
+                const windConstraint = Math.round((reduceStart + reduceEnd) * 1e6) / 1e6;
                 return Vector.getVector(windConstraint, angle);
             });
-            const maxWindConstraint = windConstraints.reduce((max, current) => current.intensity > max.intensity ? current : max , new Vector(0, 0));
+            const maxWindConstraint = windConstraints.reduce((max, current) => (current.intensity - max.intensity) > 1e-6 ? current : max , new Vector(0, 0));
             pole.windConstraint = maxWindConstraint;
         });
     }

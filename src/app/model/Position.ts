@@ -1,17 +1,22 @@
+/**
+ * 3-D position in Lambert 72 (EPSG:31370) metres.
+ * Code that interacts with OpenLayers must convert via the helpers in
+ * services/projection.ts — Position never holds EPSG:3857 or EPSG:4326 values.
+ */
 export class Position {
-    /** X coordinate (m) */
+    /** Lambert 72 easting (m) */
     public x: number;
 
-    /** Y coordinate (m) */
+    /** Lambert 72 northing (m) */
     public y: number;
 
-    /** Z coordinate / elevation (m) */
+    /** Elevation (m) */
     public z: number;
 
     constructor(x: number, y: number, z: number = 0) {
-        this.x = x;
-        this.y = y;
-        this.z = z;
+        this.x = Math.round(x * 100) / 100;
+        this.y = Math.round(y * 100) / 100;
+        this.z = Math.round(z * 100) / 100;
     }
 
     /**
