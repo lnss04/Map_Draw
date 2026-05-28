@@ -120,11 +120,11 @@ export class LineSection {
     }
 
     public getStartPoleHangingHeightFactor(): number {
-        return this.section.startPole.aboveGroundHeight / (this.section.startPole.aboveGroundHeight - this.line.hangingHeight);
+        return (this.section.startPole.aboveGroundHeight - this.line.hangingHeight) / this.section.startPole.aboveGroundHeight;
     }
 
     public getEndPoleHangingHeightFactor(): number {
-        return  this.section.endPole.aboveGroundHeight / (this.section.endPole.aboveGroundHeight - this.line.hangingHeight);
+        return (this.section.endPole.aboveGroundHeight - this.line.hangingHeight) / this.section.endPole.aboveGroundHeight;
     }
 
     public getMechanicalConstraintStartVector(): Vector {
@@ -142,13 +142,13 @@ export class LineSection {
         const diameter = this.line.cable.diameter/1000;
         const windForcePerMeter = Calculator.getWindForcePerMeter(diameter);
         const windForce = windForcePerMeter * this.section.length;
-        return windForce / this.getStartPoleHangingHeightFactor() * Math.abs(Math.sin(angle)) / 2;
+        return windForce * this.getStartPoleHangingHeightFactor() * Math.abs(Math.sin(angle)) / 2;
     }
     getWindConstraintEndVector(windAngle: number): number {
         const angle = this.section.angle - windAngle;
         const diameter = this.line.cable.diameter/1000;
         const windForcePerMeter = Calculator.getWindForcePerMeter(diameter);
         const windForce = windForcePerMeter * this.section.length;
-        return windForce / this.getEndPoleHangingHeightFactor() * Math.abs(Math.sin(angle)) / 2;
+        return windForce * this.getEndPoleHangingHeightFactor() * Math.abs(Math.sin(angle)) / 2;
     }
 }
